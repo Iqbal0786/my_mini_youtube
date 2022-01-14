@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://kit.fontawesome.com/f3f741aedb.js" crossorigin="anonymous"></script>
+    <title>Document</title>
+    <style>
+         /* nav bar css */
+         *{
+            padding: 0px;
+            margin: 0px;
+        }
+        #navBar{
+            width: 100%;
+            height: 60px;
+            border-bottom: 1px solid gray;
+            margin: auto;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        #lhs{
+            width: 15%;
+            height: 100%;
+            /* border: 1px solid green; */
+            display: flex;
+            justify-content:space-around;
+        }
+        #lhs > img{
+             width: 130px;
+             height: 90px;
+             margin-top: -15px;
+             cursor: pointer;
+        }
+        #lhs>i{
+            font-size: 25px;
+            margin-top: 15px;
+            cursor: pointer;
+        }
+        #rhs{
+            width: 25%;
+            height: 100%;
+            /* border: 1px solid green; */
+            display: flex;
+            justify-content: space-around;
+        }
+        #rhs > img{
+            width: 40px;
+            height: 40px;
+            padding: 5px;
+            cursor: pointer;
+        }
+        #searchBox{
+            width: 50%;
+            height: 90%;
+            /* border: 1px solid orangered; */
+            display: flex;
+            padding-top: 5px;
+        }
+        #searchBox > input{
+            width: 500px;
+            height: 40px;
+            border-right: none;
+        }
+        #searchBox > button{
+             width: 90px;
+             height: 40px;
+             cursor: pointer;
+             padding: 10px;
+             border: none;
+             background: transparent;
+
+        }
+        #searchBox  > i{
+            font-size: 30px;
+            padding-left: 25px;
+            padding-top: 5px;
+            cursor: pointer;
+        }
+        #searchIcon{
+            width: 37px;
+            cursor: pointer;
+        }
+        /* content display div */
+        /* div{
+            border: 1px solid black;
+        } */
+        #nav{
+            height: 100px;
+        }
+        #main{
+            display: flex;
+            height: 700px;
+            gap: 20px;
+            padding: 10px;
+        }
+        #video_Details{
+            flex:3;
+            height: 630px;
+        }
+        #recommendatonDiv{
+            flex:2;
+            overflow: auto;
+        }
+        #recommendatonDiv > .childDiv{
+            width: 100%;
+            height: 200px;
+            display: flex;
+            margin-bottom: 10px;
+            border-bottom: 1px solid gray;
+            
+        }
+        .childDiv > img{
+            width: 45%;
+            height: 100%;
+        }
+        .childDiv > .videoDesc{
+            width: 55%;
+            height: 100%;
+        }
+        .videoDesc > p{
+            font-size: 19px;
+            font-family: sans-serif;
+            padding-left: 5px;
+        }
+        #videoTitle{
+            width: 100%;
+            height: 100px;
+            font-family: sans-serif;
+            font-size: 19px;
+            border: 1px solid gray;
+        }
+    </style>
+</head>
+<body>
+      <!-- navBar div -->
+    <div id="navBar">
+        <div id="lhs">
+            <i class="fa fa-bars" aria-hidden="true"></i>
+            <img src="ytlogo.png" alt="">
+        </div>
+        <div id="searchBox">
+            <input type="text" id="searchInput">
+             <div id="searchIconDiv"> <button onclick="searchVideo()"><img src="search.svg" alt="" id="searchIcon"></button></div>
+             <i class="fas fa-microphone"></i>
+        </div>
+        <div id="rhs">
+             <img src="video plus.png" alt="">
+             <img src="ytapps.png" alt="">
+             <img src="notification.png" alt="">
+             <img src="profile.png" alt="">
+        </div>
+    </div>
+     <!-- main Div that contains the video div and recommended video list -->
+    <div id="main">
+        <div id="video_Details">
+        </div>
+        <div id="recommendatonDiv">
+
+        </div>
+    </div>
+</body>
+</html>
+<script>
+    // getting the clicked video id  
+    let {videoId,snippet}= JSON.parse(localStorage.getItem("click_video"));
+    console.log(snippet)
+
+    // code to  displaying the clicked video in the div
+     let displayVideo=()=>{
+         // creating iframe for the video 
+         let iframe= document.createElement("iframe");
+         // creating the video about div that contains video info like title etc.
+         let videoAboutDiv=document.createElement("div");
+          videoAboutDiv.setAttribute("id","videoTitle");
+          // creating the title element
+          let title= document.createElement("p");
+          title.textContent=snippet.title;
+          // appending the title in the video about div
+          videoAboutDiv.append(title);
+          // setting the attributes of the iframe element
+         iframe.setAttribute("id","videoFrame")
+         iframe.width="100%"
+         iframe.height="100%";
+         // on each click on the item ,setting the video id to display in the iframe 
+         iframe.src=`https://www.youtube.com/embed/${videoId}`;
+         iframe.setAttribute("allowfullscreen","true");
+         // appending the clciked video in the video_Details div
+         document.querySelector("#video_Details").append(iframe,videoAboutDiv);
+     }
+     // calling the displayVideo function
+     displayVideo();
+
+     // code for showing the recommended video 
+
+     // getting the data from local storage 
+     let recommendedList= JSON.parse(localStorage.getItem("recommendedVideoList"));
+     // code to show video on each clcik in the div
+     const showRecommended=(list)=>{
+         let parent= document.querySelector("#recommendatonDiv");
+         parent.innerHTML="";
+         // accessing each video and showing it into the iframe when anyone is clciked
+         list.map(({snippet, id:{videoId}})=>{
+         let childDiv= document.createElement("div");
+         childDiv.setAttribute("class","childDiv");
+         let thumbnail= document.createElement("img");
+        thumbnail.src=snippet.thumbnails.medium.url;
+         let title=document.createElement("p");
+          title.textContent=snippet.title;
+         let movieDescDiv=document.createElement("div");
+         movieDescDiv.setAttribute("class","videoDesc");
+         movieDescDiv.append(title);
+          childDiv.append(thumbnail,movieDescDiv);
+          // on each click , showing the video with it's title 
+          childDiv.onclick=()=>{
+              document.querySelector("#videoFrame").src=`https://www.youtube.com/embed/${videoId}`;
+              document.querySelector("#videoTitle").textContent=snippet.title;
+          }
+          // appending the childDiv in the  parent div
+          parent.append(childDiv);
+         })
+     }
+     // calling the function
+     showRecommended(recommendedList);
+
+</script>

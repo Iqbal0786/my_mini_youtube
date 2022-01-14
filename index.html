@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://kit.fontawesome.com/f3f741aedb.js" crossorigin="anonymous"></script>
+    <title>Document</title>
+    <style>
+        /* nav bar css */
+        *{
+            padding: 0px;
+            margin: 0px;
+        }
+        #navBar{
+            width: 100%;
+            height: 60px;
+            border-bottom: 1px solid gray;
+            margin: auto;
+            display: flex;
+            justify-content: space-between;
+        }
+        #lhs{
+            width: 15%;
+            height: 100%;
+            /* border: 1px solid green; */
+            display: flex;
+            justify-content:space-around;
+        }
+        #lhs > img{
+             width: 130px;
+             height: 90px;
+             margin-top: -15px;
+             cursor: pointer;
+        }
+        #lhs>i{
+            font-size: 25px;
+            margin-top: 15px;
+            cursor: pointer;
+        }
+        #rhs{
+            width: 25%;
+            height: 100%;
+            /* border: 1px solid green; */
+            display: flex;
+            justify-content: space-around;
+        }
+        #rhs > img{
+            width: 40px;
+            height: 40px;
+            padding: 5px;
+            cursor: pointer;
+        }
+        #searchBox{
+            width: 50%;
+            height: 90%;
+            /* border: 1px solid orangered; */
+            display: flex;
+            padding-top: 5px;
+        }
+        #searchBox > input{
+            width: 500px;
+            height: 40px;
+            border-right: none;
+        }
+        #searchBox > button{
+             width: 90px;
+             height: 40px;
+             cursor: pointer;
+             padding: 10px;
+             border: none;
+             background: transparent;
+
+        }
+        #searchBox  > i{
+            font-size: 30px;
+            padding-left: 25px;
+            padding-top: 5px;
+            cursor: pointer;
+        }
+        #searchIcon{
+            width: 37px;
+            cursor: pointer;
+        }
+
+        /* search result div css */
+        #search_result{
+            width: 80%;
+            display: grid;
+            grid-template-columns: repeat(4,1fr);
+            grid-gap: 20px;
+            padding: 20px;
+            justify-content: space-between;
+        }
+        #search_result >.childDiv{
+            width:300px;
+            height: 370px;
+            /* border: 1px solid red; */
+            cursor: pointer;
+            border-radius: 8px;
+            box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
+        }
+        .childDiv > img{
+            width: 100%;
+            height: 200px;
+            border-radius: 7px;
+        }
+    </style>
+</head>
+<body>
+    <div id="navBar">
+        <div id="lhs">
+            <i class="fa fa-bars" aria-hidden="true"></i>
+            <img src="ytlogo.png" alt="">
+        </div>
+        <div id="searchBox">
+            <input type="text" id="searchInput">
+             <div id="searchIconDiv"> <button onclick="searchVideo()"><img src="search.svg" alt="" id="searchIcon"></button></div>
+             <i class="fas fa-microphone"></i>
+        </div>
+        <div id="rhs">
+             <img src="video plus.png" alt="">
+             <img src="ytapps.png" alt="">
+             <img src="notification.png" alt="">
+             <img src="profile.png" alt="">
+        </div>
+    </div>
+     <div id="search_result">
+        <!-- <iframe
+        width="560"
+        height="315"
+        src="https://www.youtube.com/embed/KXFmaE5B9E8"
+        title="YouTube video player"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+      ></iframe> -->
+         
+
+     </div>
+</body>
+</html>
+<script>
+
+     //  fetching trending video data from api
+     async function trendingVideo(){
+        try{
+            let req= await fetch(`https://youtube.googleapis.com/youtube/v3/search?part=snippet&chart=mostPopular&regionCode=IN&type=video&key=AIzaSyCOpksKtB_JOfHYQqATjcQD0QtaVg3_Zzg&maxResults=20`);
+            let data= await req.json();
+            let videos= data.items;
+            localStorage.setItem("recommendedVideoList",JSON.stringify(videos));
+            display(videos);
+
+            console.log(data)
+        }
+        catch(err){
+            console.log(err.error.message)
+        }
+    }
+    trendingVideo();
+   // fetching searched video from api 
+    async function searchVideo(){
+        let searchStr= document.querySelector("#searchInput").value;
+        try{
+            let req= await fetch(`https://youtube.googleapis.com/youtube/v3/search?part=snippet&q=${searchStr}&type=video&key=AIzaSyCOpksKtB_JOfHYQqATjcQD0QtaVg3_Zzg&maxResults=20`);
+            let data= await req.json();
+            let videos= data.items;
+            localStorage.setItem("recommendedVideoList",JSON.stringify(videos));
+            display(videos);
+
+            console.log(data)
+        }
+        catch(err){
+            console.log(err)
+        }
+    }
+
+    // displaying the data in after fetching the request
+    const display=(data)=>{
+        let parent=document.querySelector("#search_result");
+        parent.innerHTML="";
+        console.log(data)
+      
+        // accessing each data from the api data
+        
+     data.forEach(({snippet, id:{videoId}})=>{
+        //  let { id:{videoId}}=elem;
+        //  let iframe= document.createElement("iframe");
+        //  iframe.src=`https://www.youtube.com/embed/${videoId}`;
+        //  iframe.height="215";
+        //  iframe.width="460";
+        //  iframe.setAttribute("allowfullscreen","true");
+        // creating child div
+        let childDiv= document.createElement("div");
+        childDiv.setAttribute("class","childDiv");
+        // creating title element
+        let title= document.createElement("p");
+        title.textContent=snippet.title;
+        // creating thumbnail for the video
+        let thumbnail= document.createElement("img");
+        thumbnail.src=snippet.thumbnails.medium.url;
+
+        // creating an object which contains the current clciked data ans show it on the next page
+        childDiv.append(thumbnail,title);  
+         let send_video={
+             snippet,
+             videoId
+         }
+
+     // applying onclick functionality on each item that will be show on the next page
+         childDiv.onclick=()=>{
+           showVideo(send_video);
+         }
+         // appending the child div in parent div 
+        parent.append(childDiv);
+     })
+    }
+    // showVideo funciton 
+   const showVideo= (data)=>{
+       // getting the clicked video and setting it into the localStorage
+       localStorage.setItem("click_video",JSON.stringify(data));
+
+       window.location.href="video.html";
+   }
+
+   
+</script>
